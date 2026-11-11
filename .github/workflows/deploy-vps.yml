@@ -1,0 +1,69 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: whatsapp-webhook-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  SERVER_HOST: 163.176.195.173
+  SERVER_USER: ubuntu
+  APP_DIR: whatsapp-webhook
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare SSH
+        env:
+          SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_KEY" || { echo "Configure secret SERVER_SSH_KEY"; exit 1; }
+          test -n "$SERVER_HOST" || { echo "SERVER_HOST is missing from the workflow configuration"; exit 1; }
+          test -n "$SERVER_USER" || { echo "SERVER_USER is missing from the workflow configuration"; exit 1; }
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p 22 -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Sync application files
+        env:
+          SERVER_HOST: ${{ env.SERVER_HOST }}
+          SERVER_USER: ${{ env.SERVER_USER }}
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/deploy_key -p 22 -o StrictHostKeyChecking=yes \
+            "$SERVER_USER@$SERVER_HOST" "mkdir -p ~/$APP_DIR/data"
+          rsync -az --delete \
+            --filter='P .env' \
+            --filter='P data/' \
+            --exclude='.env*' \
+            --exclude='data/' \
+            --exclude='node_modules/' \
+            --exclude='dist/' \
+            --exclude='docs/' \
+            --exclude='tests/' \
+            --exclude='Pasted image.png' \
+            -e "ssh -i ~/.ssh/deploy_key -p 22 -o StrictHostKeyChecking=yes" \
+            ./ "$SERVER_USER@$SERVER_HOST:~/$APP_DIR/"
+
+      - name: Build and restart application
+        env:
+          SERVER_HOST: ${{ env.SERVER_HOST }}
+          SERVER_USER: ${{ env.SERVER_USER }}
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/deploy_key -p 22 -o StrictHostKeyChecking=yes \
+            "$SERVER_USER@$SERVER_HOST" \
+            "APP_DIR=\$HOME/$APP_DIR bash \$HOME/$APP_DIR/scripts/deploy/deploy-vps.sh"
