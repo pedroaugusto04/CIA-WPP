@@ -125,6 +125,14 @@ export class SessionRepository {
     return { ...session };
   }
 
+  getOperationalStats(now = Date.now()): { monthlySent: number; monthlyRemaining: number; trackedSessions: number } {
+    const sent = (this.state.outbound.monthly ?? []).filter((stamp) => {
+      const date = new Date(stamp);
+      return date.getUTCMonth() === new Date(now).getUTCMonth() && date.getUTCFullYear() === new Date(now).getUTCFullYear();
+    }).length;
+    return { monthlySent: sent, monthlyRemaining: Math.max(0, this.config.monthlyMessageLimit - sent), trackedSessions: Object.keys(this.state.sessions).length };
+  }
+
   async commit(
     phone: string,
     state: AttendanceState,

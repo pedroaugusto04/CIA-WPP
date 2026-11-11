@@ -10,14 +10,16 @@ import { registerWebhookRoutes } from './routes/webhook.js';
 export async function buildApp(config: AppConfig): Promise<FastifyInstance> {
   const repository = new SessionRepository(config);
   await repository.initialize();
+  const app = Fastify({ logger: { level: config.logLevel } });
+  app.log.info({ ...repository.getOperationalStats(), monthlyLimit: config.monthlyMessageLimit, shortLimitPerContact: config.shortMessageLimit, shortWindowSeconds: config.shortWindowMs / 1000, stateFile: config.stateFile }, 'Aplicação inicializada');
 
   const attendance = new AttendanceService(
     config.attendance,
     repository,
     new WhatsAppClient(config),
     config,
+    app.log,
   );
-  const app = Fastify({ logger: { level: config.logLevel } });
 
   const cleanupTimer = setInterval(() => {
     void attendance
