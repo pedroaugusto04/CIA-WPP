@@ -4,6 +4,8 @@ import type { HumanReplyEcho, InboundMessage } from '../types/whatsapp.js';
 import { isRecord } from '../utils/validation.js';
 
 export function extractMessages(body: unknown, phoneNumberId: string): InboundMessage[] {
+  const growhubMessage = extractGrowhubMessage(body, phoneNumberId);
+  if (growhubMessage) return [growhubMessage];
   if (!isRecord(body) || !Array.isArray(body.entry)) return [];
   const result: InboundMessage[] = [];
   for (const entry of body.entry as unknown[]) {
@@ -30,6 +32,29 @@ export function extractMessages(body: unknown, phoneNumberId: string): InboundMe
     }
   }
   return result;
+}
+
+function extractGrowhubMessage(body: unknown, phoneNumberId: string): InboundMessage | undefined {
+  if (
+    !isRecord(body) ||
+    typeof body.event !== 'string' ||
+    body.phoneNumberId !== phoneNumberId ||
+    typeof body.from !== 'string' ||
+    !DIGITS_ONLY_PATTERN.test(body.from) ||
+    typeof body.messageId !== 'string' ||
+    body.messageId.length === 0 ||
+    typeof body.type !== 'string' ||
+    typeof body.content !== 'string' ||
+    body.content.trim().length === 0
+  ) {
+    return undefined;
+  }
+
+  return {
+    from: body.from,
+    id: body.messageId,
+    content: { type: 'text', text: body.content.trim() },
+  };
 }
 
 export function extractHumanReplyEchoes(body: unknown, phoneNumberId: string): HumanReplyEcho[] {
