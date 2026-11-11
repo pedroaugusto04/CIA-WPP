@@ -36,6 +36,10 @@ export interface AppConfig {
   deduplicationTtlMs: number;
   cleanupIntervalMs: number;
   sessionHashSecret: string;
+  monthlyMessageLimit: number;
+  shortMessageLimit: number;
+  shortWindowMs: number;
+  shortLimitMessage: string;
   attendance: AttendanceConfig;
 }
 
@@ -112,6 +116,10 @@ export function loadConfig(env: Environment): AppConfig {
         Math.floor(MAX_TIMER_DELAY_MS / MILLISECONDS_PER_SECOND),
       ) * MILLISECONDS_PER_SECOND,
     sessionHashSecret: readHashSecret(env),
+    monthlyMessageLimit: integer(env, 'OUTBOUND_MONTHLY_LIMIT'),
+    shortMessageLimit: integer(env, 'OUTBOUND_SHORT_LIMIT'),
+    shortWindowMs: integer(env, 'OUTBOUND_SHORT_WINDOW_SECONDS') * MILLISECONDS_PER_SECOND,
+    shortLimitMessage: required(env, 'OUTBOUND_SHORT_LIMIT_MESSAGE'),
     attendance: readAttendanceConfig(env),
   };
 }

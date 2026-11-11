@@ -15,6 +15,7 @@ export async function buildApp(config: AppConfig): Promise<FastifyInstance> {
     config.attendance,
     repository,
     new WhatsAppClient(config),
+    config,
   );
   const app = Fastify({ logger: { level: config.logLevel } });
 

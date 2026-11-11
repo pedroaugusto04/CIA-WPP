@@ -12,6 +12,7 @@ export class AttendanceService {
     private readonly config: AttendanceConfig,
     private readonly repository: SessionRepository,
     private readonly sender: TextSender,
+    private readonly limits: Pick<import('../config/env.js').AppConfig, 'shortLimitMessage'> = { shortLimitMessage: 'Recebemos várias mensagens em pouco tempo. Aguarde um pouco e tente novamente.' },
   ) {}
 
   process(message: InboundMessage): Promise<void> {
@@ -24,6 +25,10 @@ export class AttendanceService {
         this.config,
       );
       for (const outbound of combineOutboundMessages(transition.messages)) {
+        const limit = await this.repository.reserveOutbound(message.from);
+        if (limit === 'monthly') break;
+        if (limit === 'short') await this.sender.send(message.from, { type: 'text', body: this.limits.shortLimitMessage });
+        if (limit === 'short' || limit === 'short-silent') break;
         await this.sender.send(message.from, outbound);
       }
       await this.repository.commit(
