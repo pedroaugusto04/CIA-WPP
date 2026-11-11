@@ -23,6 +23,7 @@ export interface AppConfig {
   host: string;
   port: number;
   logLevel: LogLevel;
+  logWebhookPayloadShape: boolean;
   webhookPaths: string[];
   verifyToken: string;
   accessToken: string;
@@ -83,6 +84,7 @@ export function loadConfig(env: Environment): AppConfig {
     host: required(env, 'HOST'),
     port: integer(env, 'PORT', MAX_TCP_PORT),
     logLevel,
+    logWebhookPayloadShape: env.WEBHOOK_LOG_PAYLOAD_SHAPE?.trim().toLowerCase() === 'true',
     webhookPaths,
     verifyToken: required(env, 'META_VERIFY_TOKEN'),
     accessToken: required(env, 'META_ACCESS_TOKEN'),
