@@ -8,16 +8,13 @@ import type { Environment } from './readers.js';
 
 function commands(env: Environment, key: string): string[] {
   const values = stringList(parseJson(required(env, key), key), key).map(normalizeInput);
-  if (
-    new Set(values).size !== values.length ||
-    values.some((value) => DIGITS_ONLY_PATTERN.test(value))
-  ) {
+  if (values.some((value) => DIGITS_ONLY_PATTERN.test(value))) {
     throw new ApplicationError(
       ErrorCode.CONFIGURATION_INVALID,
-      `${key} deve conter comandos distintos e não numéricos.`,
+      `${key} deve conter comandos não numéricos.`,
     );
   }
-  return values;
+  return [...new Set(values)];
 }
 
 function resource(env: Environment, messageKey: string, urlKey: string): ResourceConfig {

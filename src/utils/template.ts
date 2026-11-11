@@ -8,5 +8,9 @@ export function renderTemplate(template: string, values: Record<string, string>)
 }
 
 export function normalizeInput(value: string): string {
-  return value.trim().toLocaleLowerCase(INPUT_LOCALE);
+  return value
+    .trim()
+    .toLocaleLowerCase(INPUT_LOCALE)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
 }
