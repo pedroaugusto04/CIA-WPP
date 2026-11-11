@@ -1,3 +1,5 @@
+import { normalizeInput } from '../../utils/template.js';
+
 export const MenuOption = {
   PARENTS: 'parents',
   ADULTS: 'adults',
@@ -44,6 +46,14 @@ const PROFILE_ALIASES: Readonly<Record<string, (typeof PROFILE_OPTIONS)[number]>
   mother_or_father: PROFILE_OPTIONS[0],
   family_member: PROFILE_OPTIONS[1],
   autistic_adult: PROFILE_OPTIONS[2],
+  mae: PROFILE_OPTIONS[0],
+  pai: PROFILE_OPTIONS[0],
+  'mae ou pai': PROFILE_OPTIONS[0],
+  'mae/pai': PROFILE_OPTIONS[0],
+  'mae e pai': PROFILE_OPTIONS[0],
+  familiar: PROFILE_OPTIONS[1],
+  'membro da familia': PROFILE_OPTIONS[1],
+  'adulto autista': PROFILE_OPTIONS[2],
 };
 
 const TEXT_MENU_ALIASES: Readonly<Record<string, MenuOption>> = {
@@ -63,12 +73,12 @@ const TEXT_MENU_ALIASES: Readonly<Record<string, MenuOption>> = {
 };
 
 export function parseMenuOption(input: string): MenuOption | undefined {
-  const value = input.startsWith('menu:') ? input.slice(5) : input;
+  const value = normalizeInput(input.startsWith('menu:') ? input.slice(5) : input);
   if (isMenuOption(value)) return value;
   return TEXT_MENU_ALIASES[value];
 }
 
 export function parseProfile(input: string): (typeof PROFILE_OPTIONS)[number] | undefined {
-  const value = input.startsWith('profile:') ? input.slice('profile:'.length) : input;
+  const value = normalizeInput(input.startsWith('profile:') ? input.slice('profile:'.length) : input);
   return PROFILE_ALIASES[value];
 }

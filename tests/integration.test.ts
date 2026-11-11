@@ -157,6 +157,9 @@ test('acolhimento valida os três perfis e permite pular para humano em qualquer
       ),
     );
   }
+  for (const phrase of ['mãe', 'mae', 'pai', 'mãe ou pai', 'mae ou pai']) {
+    assert.equal(transitionAttendance(session(State.PROFILE), phrase, config).state, State.HUMAN);
+  }
   assert.equal(
     transitionAttendance(session(State.PROFILE), 'nome pessoal', config).state,
     State.PROFILE,
