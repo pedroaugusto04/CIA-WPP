@@ -65,6 +65,7 @@ export interface AttendanceConfig {
   staleSelectionMessage: string;
   unsupportedMessage: string;
   navigationMessage: string;
+  resourceFooterMessage: string;
   humanMessage: string;
   resourceUnavailableMessage: string;
   parents: ResourceConfig;

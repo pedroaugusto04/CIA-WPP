@@ -148,6 +148,7 @@ export function readAttendanceConfig(env: Environment): AttendanceConfig {
     staleSelectionMessage: required(env, 'BOT_STALE_SELECTION_MESSAGE'),
     unsupportedMessage: required(env, 'BOT_UNSUPPORTED_MESSAGE'),
     navigationMessage: required(env, 'BOT_NAVIGATION_MESSAGE'),
+    resourceFooterMessage: required(env, 'BOT_RESOURCE_FOOTER_MESSAGE'),
     humanMessage: required(env, 'BOT_HUMAN_MESSAGE'),
     resourceUnavailableMessage: required(env, 'BOT_RESOURCE_UNAVAILABLE_MESSAGE'),
     parents: resource(env, 'PARENTS_GROUP_MESSAGE', 'PARENTS_GROUP_FORM_URL'),

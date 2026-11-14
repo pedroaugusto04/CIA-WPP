@@ -119,7 +119,7 @@ function showResource(resource: ResourceConfig, config: AttendanceConfig): Trans
     return handoff(config, [text(resource.message), text(config.resourceUnavailableMessage)]);
   }
   return transition(AttendanceState.MENU, [
-    text(`${resource.message}\n\n${resource.url}\n\n${config.navigationMessage}`),
+    text(`${resource.message}\n\n${resource.url}\n\n${config.resourceFooterMessage}`),
   ]);
 }
 
