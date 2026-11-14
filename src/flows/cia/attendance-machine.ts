@@ -29,18 +29,16 @@ export function transitionAttendance(
   const input = content.type === 'text' ? normalizeInput(content.text) : content.id;
 
   const isMenuAction =
-    (content.type === 'selection' && input === NavigationOption.MENU) ||
+    input === NavigationOption.MENU ||
     (content.type === 'text' &&
       (config.menuCommands.includes(input) ||
         input === normalizeInput(config.profileBackLabel) ||
-        input === normalizeInput(config.faqBackLabel) ||
-        input === 'voltar' ||
-        input === 'voltar ao menu'));
+        input === normalizeInput(config.faqBackLabel)));
 
   if (isMenuAction) return showMenu(config);
 
   const isHumanAction =
-    (content.type === 'selection' && input === NavigationOption.HUMAN) ||
+    input === NavigationOption.HUMAN ||
     (content.type === 'text' &&
       (config.humanCommands.includes(input) || input === normalizeInput(config.profileHumanLabel)));
 
