@@ -132,6 +132,50 @@ test('menu cobre todas as opções e seleções avulsas iniciam no menu', () => 
   if (menu?.type === 'list') assert.equal(menu.rows.length, 7);
   assert.equal(transitionAttendance(session(State.MENU), '7', config).state, State.HUMAN);
   assert.equal(transitionAttendance(session(State.MENU), '99', config).state, State.MENU);
+  for (const phrase of [
+    'Grupo de pais',
+    'grupo de pais',
+    'pais',
+    'grupo dos pais',
+    'grupo de pais e familiares',
+  ]) {
+    const result = transitionAttendance(session(State.MENU), phrase, config);
+    assert.equal(result.state, State.MENU);
+    assert.ok(
+      result.messages.some(
+        (message) => message.type === 'text' && message.body.includes('https://example.com/pais'),
+      ),
+    );
+  }
+  for (const phrase of ['Grupo de adultos', 'grupo de adultos', 'adultos', 'grupo adultos']) {
+    assert.equal(transitionAttendance(session(State.MENU), phrase, config).state, State.HUMAN);
+  }
+  for (const phrase of ['Projeto Teativo', 'projeto teativo', 'teativo']) {
+    const result = transitionAttendance(session(State.MENU), phrase, config);
+    assert.equal(result.state, State.MENU);
+    assert.ok(
+      result.messages.some(
+        (message) =>
+          message.type === 'text' && message.body.includes('https://example.com/teativo'),
+      ),
+    );
+  }
+  for (const phrase of ['Carteirinha', 'carteirinha', 'carteira']) {
+    const result = transitionAttendance(session(State.MENU), phrase, config);
+    assert.equal(result.state, State.MENU);
+    assert.ok(
+      result.messages.some(
+        (message) =>
+          message.type === 'text' && message.body.includes('https://example.com/carteira'),
+      ),
+    );
+  }
+  for (const phrase of ['Acolhimento', 'acolhimento']) {
+    assert.equal(transitionAttendance(session(State.MENU), phrase, config).state, State.PROFILE);
+  }
+  for (const phrase of ['Falar com a equipe', 'falar com a equipe', 'equipe']) {
+    assert.equal(transitionAttendance(session(State.MENU), phrase, config).state, State.HUMAN);
+  }
   const pending = transitionAttendance(
     session(State.MENU),
     '1',
@@ -159,6 +203,15 @@ test('acolhimento valida os três perfis e permite pular para humano em qualquer
   }
   for (const phrase of ['mãe', 'mae', 'pai', 'mãe ou pai', 'mae ou pai']) {
     assert.equal(transitionAttendance(session(State.PROFILE), phrase, config).state, State.HUMAN);
+  }
+  for (const phrase of ['Autista adulto', 'autista adulto', 'adulto autista', 'autistas adultos']) {
+    assert.equal(transitionAttendance(session(State.PROFILE), phrase, config).state, State.HUMAN);
+  }
+  for (const phrase of ['Familiar', 'familiar', 'familiares', 'membro da família']) {
+    assert.equal(transitionAttendance(session(State.PROFILE), phrase, config).state, State.HUMAN);
+  }
+  for (const nav of ['Voltar ao menu', 'voltar ao menu', 'voltar']) {
+    assert.equal(transitionAttendance(session(State.PROFILE), nav, config).state, State.MENU);
   }
   assert.equal(
     transitionAttendance(session(State.PROFILE), 'nome pessoal', config).state,

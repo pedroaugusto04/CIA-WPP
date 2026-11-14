@@ -28,16 +28,23 @@ export function transitionAttendance(
 
   const input = content.type === 'text' ? normalizeInput(content.text) : content.id;
 
-  if (content.type === 'selection' && input === NavigationOption.MENU) return showMenu(config);
-  if (content.type === 'selection' && input === NavigationOption.HUMAN) return handoff(config);
+  const isMenuAction =
+    (content.type === 'selection' && input === NavigationOption.MENU) ||
+    (content.type === 'text' &&
+      (config.menuCommands.includes(input) ||
+        input === normalizeInput(config.profileBackLabel) ||
+        input === normalizeInput(config.faqBackLabel) ||
+        input === 'voltar' ||
+        input === 'voltar ao menu'));
 
-  if (content.type === 'text' && config.humanCommands.includes(input)) {
-    return handoff(config);
-  }
+  if (isMenuAction) return showMenu(config);
 
-  if (content.type === 'text' && config.menuCommands.includes(input)) {
-    return showMenu(config);
-  }
+  const isHumanAction =
+    (content.type === 'selection' && input === NavigationOption.HUMAN) ||
+    (content.type === 'text' &&
+      (config.humanCommands.includes(input) || input === normalizeInput(config.profileHumanLabel)));
+
+  if (isHumanAction) return handoff(config);
 
   if (!session) {
     const messages =

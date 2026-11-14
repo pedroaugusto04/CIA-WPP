@@ -155,13 +155,13 @@ const menuTransitions: Record<MenuOption, (config: AttendanceConfig) => Transiti
 
 export const stateHandlers: Record<AttendanceState, StateHandler> = {
   [AttendanceState.MENU]: (input, config, invalidAttempts) => {
-    const option = parseMenuOption(input);
+    const option = parseMenuOption(input, config);
     return option
       ? menuTransitions[option](config)
       : invalidOption(AttendanceState.MENU, config, invalidAttempts);
   },
   [AttendanceState.PROFILE]: (input, config, invalidAttempts) => {
-    const profile = parseProfile(input);
+    const profile = parseProfile(input, config);
     return profile
       ? handoff(config, [
           text(
