@@ -314,9 +314,18 @@ test('dúvidas usa conteúdo aprovado configurável; vazio encaminha para equipe
     ),
   );
   assert.ok(
-    transitionAttendance(session(State.FAQ), 'faq:agenda', config).messages.some(
+    transitionAttendance(session(State.FAQ), 'Como agendar?', config).messages.some(
       (message) => message.type === 'text' && message.body.includes('Converse com a equipe.'),
     ),
+  );
+  assert.ok(
+    transitionAttendance(session(State.FAQ), '1', config).messages.some(
+      (message) => message.type === 'text' && message.body.includes('Converse com a equipe.'),
+    ),
+  );
+  assert.equal(
+    transitionAttendance(session(State.FAQ), 'Voltar ao menu', config).state,
+    State.MENU,
   );
   assert.equal(transitionAttendance(session(State.FAQ), '99', config).state, State.FAQ);
   assert.equal(

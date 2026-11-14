@@ -39,7 +39,7 @@ export const PROFILE_OPTIONS = [
     id: 'mother_or_father',
     labelKey: 'mother_or_father',
     number: '1',
-    aliases: ['mae', 'pai', 'mae ou pai'],
+    aliases: ['mae', 'pai', 'mae ou pai', 'mae/pai', 'mae e pai', 'pai ou mae'],
   },
   {
     id: 'family_member',
@@ -51,7 +51,7 @@ export const PROFILE_OPTIONS = [
     id: 'autistic_adult',
     labelKey: 'autistic_adult',
     number: '3',
-    aliases: ['autista adulto', 'adulto autista'],
+    aliases: ['autista adulto', 'adulto autista', 'autista'],
   },
 ] as const;
 
@@ -61,6 +61,8 @@ export function parseMenuOption(input: string, config?: AttendanceConfig): MenuO
 
   for (const option of MENU_OPTIONS) {
     if (
+      value === option.id ||
+      value === option.labelKey ||
       value === option.number ||
       value === option.alias ||
       (config && value === normalizeInput(config.menuLabels[option.labelKey]))
@@ -83,6 +85,7 @@ export function parseProfile(
   for (const option of PROFILE_OPTIONS) {
     if (
       value === option.id ||
+      value === option.labelKey ||
       value === option.number ||
       option.aliases.some((alias) => alias === value) ||
       (config && value === normalizeInput(config.profileLabels[option.labelKey]))

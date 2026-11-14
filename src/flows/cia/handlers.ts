@@ -175,9 +175,14 @@ export const stateHandlers: Record<AttendanceState, StateHandler> = {
   [AttendanceState.FAQ]: (input, config, invalidAttempts) => {
     const id = input.startsWith('faq:') ? input.slice('faq:'.length) : undefined;
     const normalizedInput = normalizeInput(input);
-    const entry = config.faqs.find(
-      (item) => item.id === id || normalizeInput(item.question) === normalizedInput,
-    );
+    const index = Number.parseInt(normalizedInput, 10);
+    const entry =
+      config.faqs.find(
+        (item) => item.id === id || normalizeInput(item.question) === normalizedInput,
+      ) ??
+      (Number.isInteger(index) && index >= 1 && index <= config.faqs.length
+        ? config.faqs[index - 1]
+        : undefined);
     return entry
       ? transition(AttendanceState.FAQ, [text(entry.answer), faqList(config)])
       : invalidOption(AttendanceState.FAQ, config, invalidAttempts);
